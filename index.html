@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test d'Assertivité de Gordon</title>
+
+<style>
+:root {
+    --bleu: #2E6CA4;
+    --vert: #2E8B57;
+    --rouge: #D9534F;
+    --gris: #ECEFF3;
+    --contexte-bg: #EAEFF5;
+    
+    /* Couleurs des 4 profils du visuel */
+    --color-assertif: #1565C0;
+    --color-agressif: #C62828;
+    --color-fuite: #37474F;
+    --color-manipulation: #E65100;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--gris);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #333;
+    overflow-y: auto; 
+}
+
+.app-container {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 15px;
+}
+
+.logo {
+    display: block;
+    margin: 10px auto 15px auto;
+    width: 70px;
+    mix-blend-mode: multiply;
+}
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 20px 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.08);
+    margin-bottom: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: var(--bleu);
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 15px;
+    line-height: 1.3;
+}
+
+.question-text {
+    font-size: 1.15rem;
+    line-height: 1.5;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 25px;
+    color: #111;
+    min-height: 60px;
+}
+
+.answers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.answer-btn {
+    background: #E7ECF2;
+    padding: 14px 12px;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    width: 100%;
+    text-align: left;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    color: #222;
+}
+
+.answer-btn:active {
+    background: #D8E3EE;
+}
+
+.progress-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.progress {
+    height: 10px;
+    background: #d9dee5;
+    border-radius: 10px;
+    flex-grow: 1;
+    margin-right: 15px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--bleu);
+    transition: .4s;
+}
+
+.question-number {
+    color: var(--bleu);
+    font-weight: bold;
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.screen-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.screen-text {
+    font-size: 1.05rem;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.screen-media {
+    text-align: center;
+    margin-top: 5px;
+}
+
+.screen-media img {
+    width: 100%;
+    max-height: 320px;
+    object-fit: contain;
+    border-radius: 12px;
+}
+
+.start-btn {
+    background: var(--bleu);
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+}
+
+/* Styles des résultats */
+.profile-result-box {
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    color: white;
+    text-align: center;
+}
+
+.bg-assertif { background-color: var(--color-assertif); }
+.bg-agressif { background-color: var(--color-agressif); }
+.bg-fuite { background-color: var(--color-fuite); }
+.bg-manipulation { background-color: var(--color-manipulation); }
+.bg-egalite { background: linear-gradient(135deg, var(--bleu), #4A90E2); }
+
+.profile-title {
+    font-size: 1.6rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.stat-container {
+    margin: 20px 0;
+    background: #F8F9FB;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #E2E8F0;
+}
+
+.stat-row {
+    margin-bottom: 12px;
+}
+
+.stat-labels {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+
+.stat-bar-bg {
+    height: 12px;
+    background: #E2E8F0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.stat-bar-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 6px;
+    transition: width 1s ease-out;
+}
+
+.explanation-box {
+    background: #F0F4F8;
+    padding: 15px;
+    border-radius: 12px;
+    border-left: 5px solid var(--bleu);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.restart-btn {
+    background: #555;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<img src="logo-sylp.jpg" class="logo" alt="Logo SYLP">
+
+<div class="app-container">
+
+    <div id="startScreen" class="card">
+        <h1>Test d'Assertivité (Gordon)</h1>
+        <div class="screen-layout">
+            <div class="screen-media">
+                <img src="assertivite.png" alt="Schéma Assertivité, Agressivité, Fuite, Manipulation">
+            </div>
+            <div class="screen-text">
+                <p>Découvrez votre profil relationnel dominant face aux situations du quotidien à travers 20 scénarios rapides.</p>
+                <button class="start-btn" onclick="startTest()">Démarrer le test</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="testScreen" class="card" style="display:none;">
+        <div class="progress-container">
+            <div class="progress">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+            <div id="questionNumber" class="question-number"></div>
+        </div>
+
+        <div id="questionText" class="question-text"></div>
+        <div id="answers" class="answers-list"></div>
+    </div>
+
+    <div id="resultScreen" class="card" style="display:none;">
+        <h1>Votre Profil Dominant</h1>
+        
+        <div id="dominantProfileBox" class="profile-result-box">
+            <div id="dominantTitle" class="profile-title">-</div>
+        </div>
+
+        <div class="stat-container">
+            <div class="stat-row">
+                <div class="stat-labels"><span>Assertivité</span><span id="pct-assertif">0%</span></div>
+                <div class="stat-bar-bg"><div id="bar-assertif" class="stat-bar-fill" style="background-color: var(--color-assertif);"></div></div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-labels"><span>Agressivité</span><span id="pct-agressif">0%</span></div>
+                <div class="stat-bar-bg"><div id="bar-agressif" class="stat-bar-fill" style="background-color: var(--color-agressif);"></div></div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-labels"><span>Fuite (Passivité)</span><span id="pct-fuite">0%</span></div>
+                <div class="stat-bar-bg"><div id="bar-fuite" class="stat-bar-fill" style="background-color: var(--color-fuite);"></div></div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-labels"><span>Manipulation</span><span id="pct-manipulation">0%</span></div>
+                <div class="stat-bar-bg"><div id="bar-manipulation" class="stat-bar-fill" style="background-color: var(--color-manipulation);"></div></div>
+            </div>
+        </div>
+
+        <div id="profileExplanation" class="explanation-box"></div>
+
+        <div class="screen-media" style="margin-bottom: 20px;">
+            <img src="assertivite.png" alt="Rappel des profils">
+        </div>
+
+        <button class="restart-btn" onclick="restartTest()">Refaire le test</button>
+    </div>
+
+</div>
+
+<script>
+// Base de données équilibrée : 20 questions de mise en situation
+const questionsData = [
+    {
+        q: "Un collaborateur commet une erreur répétitive sur un dossier important. Que faites-vous ?",
+        options: [
+            { text: "Je vais le voir directement, lui réexplique le problème calmement et cherche avec lui comment l'éviter.", type: "assertif" },
+            { text: "Je m'énerve immédiatement et lui fais remarquer son incompétence devant l'équipe.", type: "agressif" },
+            { text: "Je ne dis rien pour éviter le conflit, et je corrige discrètement l'erreur moi-même.", type: "fuite" },
+            { text: "Je fais des sous-entendus ironiques pendant la pause café en espérant qu'il comprenne le message.", type: "manipulation" }
+        ]
+    },
+    {
+        q: "On vous confie une surcharge de travail irréalisable pour la fin de semaine. Votre réaction :",
+        options: [
+            { text: "Je refuse fermement en disant que c'est inadmissible d'avoir une telle désorganisation.", type: "agressif" },
+            { text: "J'accepte sans rien dire, quitte à passer mes nuits au travail et à m'épuiser.", type: "fuite" },
+            { text: "J'explique mes limites actuelles factuellement et propose de hiérarchiser ou déléguer certaines tâches.", type: "assertif" },
+            { text: "J'accepte, mais je m'arrange pour tomber subtilement malade ou ralentir le rythme pour justifier le retard.", type: "manipulation" }
+        ]
+    },
+    {
+        q: "Lors d'une réunion, un collègue vous coupe la parole systématiquement. Que faites-vous ?",
+        options: [
+            { text: "Je le laisse parler et je garde mes idées pour moi, dépité.", type: "fuite" },
+            { text: "Je lui dis sur un ton calme mais ferme : « Laisse-moi terminer ma phrase, je t'écouterai juste après ».", type: "assertif" },
+            { text: "Je hausse le ton plus fort que lui en lui disant qu'il est impoli et insupportable.", type: "agressif" },
+            { text: "Je m'adresse à un autre collègue à voix haute pour tourner son intervention en dérision.", type: "manipulation" }
+        ]
+    },
+    {
+        q: "Un ami vous demande de lui prêter votre voiture, mais vous n'aimez pas prêter vos affaires.",
+        options: [
+            { text: "Je lui dis franchement que je l'apprécie beaucoup mais que je ne suis pas à l'aise avec l'idée de prêter mon véhicule.", type: "assertif" },
+            { text: "Je lui invente un problème mécanique imaginaire ou un faux rendez-vous pour esquiver la demande.", type: "manipulation" },
+            { text: "Je lui réponds sèchement qu'il n'a qu'à s'en acheter une ou louer une voiture.", type: "agressif" },
+            { text: "Je lui confie les clés à contrecœur, en passant le reste de la journée stressé.", type: "fuite" }
+        ]
+    },
+    {
+        q: "Un client conteste un tarif de manière injustifiée et agressive.",
+        options: [
+            { text: "Je m'écrase immédiatement et lui accorde une remise pour ne pas perdre la vente.", type: "fuite" },
+            { text: "Je lui rappelle subtilement qu'il aura beaucoup de mal à trouver un service de notre qualité ailleurs.", type: "manipulation" },
+            { text: "Je me défends sur le même ton agressif en l'accusant de mauvaise foi.", type: "agressif" },
+            { text: "Je reste calme, je m'appuie sur les faits du contrat et j'explique la valeur de la prestation.", type: "assertif" }
+        ]
+    },
+    // Ajout automatique des 15 autres questions pour un total de 20 (afin de simuler un test de Gordon complet)
+    { q: "On vous sert un plat froid au restaurant. Que faites-vous ?", options: [
+        { text: "Je le mange froid sans rien dire pour ne pas faire d'histoire.", type: "fuite" },
+        { text: "J'appelle poliment le serveur et demande gentiment à faire réchauffer le plat.", type: "assertif" },
+        { text: "Je fais un scandale bruyant pour que tout le monde entende le manque de professionnalisme.", type: "agressif" },
+        { text: "Je ne dis rien mais je laisse un pourboire ridicule et un avis destructeur en ligne sous pseudonyme.", type: "manipulation" }
+    ]},
+    { q: "Un collègue arrive en retard à un rendez-vous important pour la deuxième fois.", options: [
+        { text: "Je l'accueille avec agressivité : « Toujours incapable d'être à l'heure à ce que je vois ! »", type: "agressif" },
+        { text: "Je lui exprime l'impact de son retard sur le planning de manière objective.", type: "assertif" },
+        { text: "Je fais mine que tout va bien, puis je commence la réunion sans l'attendre la fois suivante sans le prévenir.", type: "manipulation" },
+        { text: "Je souris et dis que ce n'est pas grave, même si cela m'a mis en retard.", type: "fuite" }
+    ]},
+    { q: "Votre manager prend une décision technique avec laquelle vous êtes en désaccord total.", options: [
+        { text: "Je lui demande un entretien pour lui exposer mes arguments techniques de manière constructive.", type: "assertif" },
+        { text: "Je valide devant lui, puis je critique ouvertement sa décision auprès du reste de l'équipe.", type: "manipulation" },
+        { text: "Je me soumets à sa décision sans un mot, estimant que c'est lui le chef.", type: "fuite" },
+        { text: "Je conteste violemment en réunion en disant que sa stratégie est absurde.", type: "agressif" }
+    ]},
+    { q: "Quelqu'un passe devant tout le monde dans une file d'attente.", options: [
+        { text: "Je l'attrape par le bras ou l'interpelle violemment pour le faire reculer.", type: "agressif" },
+        { text: "Je ne dis rien mais je soupire bruyamment pour montrer mon mécontentement.", type: "manipulation" },
+        { text: "Je regarde ailleurs et je subis la situation.", type: "fuite" },
+        { text: "Je lui indique calmement où se trouve la fin de la file d'attente.", type: "assertif" }
+    ]},
+    { q: "Vous devez annoncer une mauvaise nouvelle (un retard de livraison) à un partenaire.", options: [
+        { text: "Je l'appelle directement, assume la situation, explique la cause et donne le nouveau délai.", type: "assertif" },
+        { text: "Je repousse l'échéance au maximum et attends qu'il m'appelle lui-même.", type: "fuite" },
+        { text: "Je rejette violemment la faute sur un fournisseur ou sur la météo pour me dédouaner.", type: "agressif" },
+        { text: "Je présente la situation de façon floue pour qu'il ne comprenne le retard qu'au dernier moment.", type: "manipulation" }
+    ]},
+    { q: "Un proche vous fait une remarque désobligeante sur votre tenue vestimentaire.", options: [
+        { text: "Je réplique instantanément par une critique encore plus assassine sur son physique.", type: "agressif" },
+        { text: "Je me sens blessé et je m'isole sans réagir.", type: "fuite" },
+        { text: "Je lui réponds avec le sourire : « Les goûts et les couleurs ne se discutent pas, moi je m'y sens très bien ».", type: "assertif" },
+        { text: "Je change de tenue mais je boude subtilement le reste de la journée.", type: "manipulation" }
+    ]},
+    { q: "On vous demande votre avis sur un projet très mal ficelé.", options: [
+        { text: "Je dis que c'est super pour faire plaisir, même si je pense le contraire.", type: "fuite" },
+        { text: "Je pointe les points positifs d'abord, puis j'énonce les axes d'amélioration factuels.", type: "assertif" },
+        { text: "Je détruis le projet en disant que c'est un travail d'amateur.", type: "agressif" },
+        { text: "Je pose des questions faussement naïves pour pousser l'auteur à s'enfoncer tout seul.", type: "manipulation" }
+    ]},
+    { q: "Votre voisin fait une fête très bruyante à 2 heures du matin en semaine.", options: [
+        { text: "Je vais frapper furieusement à sa porte en le menaçant d'appeler la police.", type: "agressif" },
+        { text: "Je mets des bouchons d'oreilles et je subis la nuit blanche en rageant.", type: "fuite" },
+        { text: "Je vais le voir calmement pour lui rappeler l'heure et lui demander de baisser le volume.", type: "assertif" },
+        { text: "Le lendemain, je fais exprès de faire du bruit très tôt le matin pour me venger.", type: "manipulation" }
+    ]},
+    { q: "On vous attribue par erreur le mérite d'un travail collectif.", options: [
+        { text: "Je garde le silence et profite des félicitations.", type: "fuite" },
+        { text: "Je rétablis la vérité de suite en citant tous les membres ayant participé.", type: "assertif" },
+        { text: "Je dis que c'est normal car c'est de toute façon moi qui porte l'essentiel du groupe.", type: "agressif" },
+        { text: "J'accepte les lauriers publiquement mais je vais dire en privé aux autres que j'ai été obligé d'accepter.", type: "manipulation" }
+    ]},
+    { q: "Un collègue vous demande un service majeur alors que vous terminez votre journée.", options: [
+        { text: "Je lui dis non fermement en lui disant qu'il n'avait qu'à s'organiser plus tôt.", type: "agressif" },
+        { text: "Je dis oui par culpabilité, en ratant mon train de retour.", type: "fuite" },
+        { text: "Je lui réponds : « Je pars maintenant, mais nous pouvons regarder cela ensemble demain dès mon arrivée ».", type: "assertif" },
+        { text: "J'accepte de mauvaise grâce, mais je ferai traîner le dossier pour lui faire payer son impolitesse.", type: "manipulation" }
+    ]},
+    { q: "Lors d'un débat familial, les opinions divergent radicalement de la vôtre.", options: [
+        { text: "Je change de conversation pour ne heurter personne.", type: "fuite" },
+        { text: "J'écoute les autres et j'exprime ma vision sans chercher à les convertir de force.", type: "assertif" },
+        { text: "Je m'emporte et traite de stupides ceux qui ne pensent pas comme moi.", type: "agressif" },
+        { text: "J'utilise des flatteries ou des paradoxes complexes pour piéger et ridiculiser l'interlocuteur.", type: "manipulation" }
+    ]},
+    { q: "On oublie de vous inviter à une réunion importante de votre service.", options: [
+        { text: "Je débarque au milieu en exigeant des explications sur cette mise à l'écart.", type: "agressif" },
+        { text: "Je me dis que je ne sers à rien et je me renferme sur moi-même.", type: "fuite" },
+        { text: "Je vais voir l'organisateur pour comprendre l'oubli et lui demander de m'envoyer le compte-rendu.", type: "assertif" },
+        { text: "Je fais mine de m'en réjouir, mais je sabote indirectement l'application des décisions prises.", type: "manipulation" }
+    ]},
+    { q: "Votre conjoint(e) oublie une date importante pour votre couple.", options: [
+        { text: "Je lui fais une crise monumentale en lui disant qu'il/elle ne m'aime pas.", type: "agressif" },
+        { text: "Je ne dis rien, mais je multiplie les soupirs et les réponses glaciales sans en donner la raison.", type: "manipulation" },
+        { text: "Je passe l'éponge en me disant que c'est de ma faute, j'aurais dû lui rappeler.", type: "fuite" },
+        { text: "Je lui exprime ma déception calmement tout en lui proposant de se rattraper ce week-end.", type: "assertif" }
+    ]},
+    { q: "Un groupe de travail n'avance pas à cause du manque d'implication de certains.", options: [
+        { text: "Je prends le leadership calmement, redéfinis les rôles de chacun et demande l'engagement de tous.", type: "assertif" },
+        { text: "Je claque la porte en hurlant que je refuse de travailler avec des paresseux.", type: "agressif" },
+        { text: "Je me plains auprès de la direction en secret pour qu'elle intervienne sans me mouiller.", type: "manipulation" },
+        { text: "Je me mets au même niveau d'inactivité en attendant que ça se passe.", type: "fuite" }
+    ]},
+    { q: "Vous avez commis une erreur manifeste sur un rapport envoyé à la hiérarchie.", options: [
+        { text: "J'essaie de modifier le fichier partagé en douce en espérant que personne ne s'en aperçoive.", type: "manipulation" },
+        { text: "Je contacte immédiatement mon manager pour signaler l'erreur et lui fournir le correctif.", type: "assertif" },
+        { text: "Je nie en bloc et affirme que quelqu'un d'autre a modifié mes données.", type: "agressif" },
+        { text: "Je panique, je n'ose plus regarder mon manager et j'attends la sanction.", type: "fuite" }
+    ]}
+];
+
+// Profils de Gordon et leurs explications respectives
+const profileExplanations = {
+    assertif: "<strong>Votre profil dominant est l'ASSERTIVITÉ.</strong><br>Vous savez affirmer vos besoins, vos droits et vos opinions tout en respectant scrupuleusement ceux de vos interlocuteurs. C'est une démarche constructive (Gagnant/Gagnant). Vous communiquez de manière claire, factuelle et calme, ce qui désamorce naturellement les conflits et instaure des relations saines et durables.",
+    agressif: "<strong>Votre profil dominant est l'AGRESSIVITÉ.</strong><br>Vous tendez à imposer vos besoins au détriment de ceux des autres (Gagnant/Perdant). Votre communication est frontale, parfois perçue comme cassante ou autoritaire. Si cela vous permet d'obtenir des résultats rapides à court terme, cela génère souvent de la rancœur, de la peur ou des conflits larvés au sein de votre entourage.",
+    fuite: "<strong>Votre profil dominant est la FUITE (ou Passivité).</strong><br>Vous avez tendance à vous retirer, à effacer vos propres besoins pour éviter à tout prix le conflit (Perdant/Gagnant). Vous n'osez pas formuler vos critiques ou vos limites. À long terme, cette attitude engendre une accumulation de frustration interne, de stress et un risque d'épuisement professionnel ou personnel.",
+    manipulation: "<strong>Votre profil dominant est la MANIPULATION.</strong><br>Vous cherchez à obtenir ce que vous voulez de manière indirecte, en jouant sur les émotions, la culpabilité ou les sous-entendus (Perdant/Perdant à long terme). Vous masquez vos intentions réelles. Bien que stratégique, ce profil altère durablement la confiance que les autres vous portent lorsque les ficelles sont découvertes."
+};
+
+let currentQuestionIndex = 0;
+let scores = { assertif: 0, agressif: 0, fuite: 0, manipulation: 0 };
+
+function startTest() {
+    currentQuestionIndex = 0;
+    scores = { assertif: 0, agressif: 0, fuite: 0, manipulation: 0 };
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("testScreen").style.display = "block";
+    loadQuestion();
+}
+
+function loadQuestion() {
+    const qData = questionsData[currentQuestionIndex];
+    
+    // Numéro de question et barre de progression
+    document.getElementById("questionNumber").innerText = `Question ${currentQuestionIndex + 1} / ${questionsData.length}`;
+    document.getElementById("progressBar").style.width = ((currentQuestionIndex) / questionsData.length) * 100 + "%";
+    
+    // Texte de la question
+    document.getElementById("questionText").innerHTML = qData.q;
+    
+    // Génération des boutons de réponse (mélangés pour éviter les biais de position)
+    let optionsHtml = "";
+    const shuffledOptions = [...qData.options].sort(() => Math.random() - 0.5);
+    
+    shuffledOptions.forEach(opt => {
+        optionsHtml += `<button class="answer-btn" onclick="selectAnswer('${opt.type}')">${opt.text}</button>`;
+    });
+    
+    document.getElementById("answers").innerHTML = optionsHtml;
+}
+
+function selectAnswer(type) {
+    scores[type]++;
+    currentQuestionIndex++;
+    
+    if (currentQuestionIndex < questionsData.length) {
+        loadQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function showResults() {
+    document.getElementById("testScreen").style.display = "none";
+    document.getElementById("resultScreen").style.display = "block";
+    
+    const total = questionsData.length;
+    
+    // Calcul des pourcentages
+    const pctAssertif = Math.round((scores.assertif / total) * 100);
+    const pctAgressif = Math.round((scores.agressif / total) * 100);
+    const pctFuite = Math.round((scores.fuite / total) * 100);
+    const pctManipulation = Math.round((scores.manipulation / total) * 100);
+    
+    // Affichage des textes et mise à jour des barres
+    document.getElementById("pct-assertif").innerText = pctAssertif + "%";
+    document.getElementById("bar-assertif").style.width = pctAssertif + "%";
+    
+    document.getElementById("pct-agressif").innerText = pctAgressif + "%";
+    document.getElementById("bar-agressif").style.width = pctAgressif + "%";
+    
+    document.getElementById("pct-fuite").innerText = pctFuite + "%";
+    document.getElementById("bar-fuite").style.width = pctFuite + "%";
+    
+    document.getElementById("pct-manipulation").innerText = pctManipulation + "%";
+    document.getElementById("bar-manipulation").style.width = pctManipulation + "%";
+    
+    // Détermination du/des profil(s) dominant(s)
+    const maxScore = Math.max(scores.assertif, scores.agressif, scores.fuite, scores.manipulation);
+    let dominants = [];
+    
+    if (scores.assertif === maxScore) dominants.push("assertif");
+    if (scores.agressif === maxScore) dominants.push("agressif");
+    if (scores.fuite === maxScore) dominants.push("fuite");
+    if (scores.manipulation === maxScore) dominants.push("manipulation");
+    
+    const titleBox = document.getElementById("dominantProfileBox");
+    const titleText = document.getElementById("dominantTitle");
+    const explanationText = document.getElementById("profileExplanation");
+    
+    // Nettoyage des classes de couleur
+    titleBox.className = "profile-result-box";
+    
+    if (dominants.length === 1) {
+        const p = dominants[0];
+        titleText.innerText = p === "fuite" ? "Fuite / Passivité" : p;
+        titleBox.classList.add("bg-" + p);
+        explanationText.innerHTML = profileExplanations[p];
+    } else {
+        // En cas d'égalité stricte
+        titleText.innerText = "Profil Mixte";
+        titleBox.classList.add("bg-egalite");
+        
+        let combinedExplanation = "<strong>Vous présentez une égalité de scores entre plusieurs profils :</strong><br><br>";
+        dominants.forEach(p => {
+            combinedExplanation += profileExplanations[p] + "<br><br>";
+        });
+        explanationText.innerHTML = combinedExplanation;
+    }
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function restartTest() {
+    document.getElementById("resultScreen").style.display = "none";
+    document.getElementById("startScreen").style.display = "block";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
